@@ -264,6 +264,10 @@ export class ZigBeeClient {
     return this.writeDeviceState(device, { state: on ? 'ON' : 'OFF' });
   }
 
+  getPosition(device: Device): Promise<DeviceState> {
+    return this.readDeviceState(device, { position: 1 });
+  }
+
   getOnOffState(device: Device): Promise<DeviceState> {
     return this.readDeviceState(device, { state: '' });
   }

@@ -60,6 +60,22 @@ export function translateTargetStateToSystemMode(val: number): SystemMode {
   }
 }
 
+export function translateCurrentStateFromSystemModePosition(
+  val: SystemMode,
+  position: number
+): number {
+  switch (val) {
+    case 'heat':
+    case 'auto':
+      if (position > 0) return HAP.Characteristic.CurrentHeatingCoolingState.HEAT;
+      else return HAP.Characteristic.CurrentHeatingCoolingState.OFF;
+    case 'cool':
+      return HAP.Characteristic.CurrentHeatingCoolingState.COOL;
+    default:
+      return HAP.Characteristic.CurrentHeatingCoolingState.OFF;
+  }
+}
+
 export class ThermostatServiceBuilder extends ServiceBuilder {
   constructor(
     platform: ZigbeeNTHomebridgePlatform,
@@ -80,7 +96,10 @@ export class ThermostatServiceBuilder extends ServiceBuilder {
       .getCharacteristic(Characteristic.CurrentHeatingCoolingState)
       .on(CharacteristicEventTypes.GET, async (callback: CharacteristicGetCallback) => {
         try {
-          callback(null, translateCurrentStateFromSystemMode(this.state.system_mode));
+          callback(
+            null,
+            translateCurrentStateFromSystemModePosition(this.state.system_mode, this.state.position)
+          );
         } catch (e) {
           callback(e);
         }
