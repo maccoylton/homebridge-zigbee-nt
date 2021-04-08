@@ -2,6 +2,7 @@ import { Service } from 'homebridge';
 import { ThermostatServiceBuilder } from '../../builders/thermostat-service-builder';
 import { DeviceState } from '../../zigbee/types';
 import { ZigBeeAccessory } from '../zig-bee-accessory';
+import { HAP } from '../../index';
 
 export class TuyaThermostatControl extends ZigBeeAccessory {
   private thermostatService: Service;
@@ -34,6 +35,18 @@ export class TuyaThermostatControl extends ZigBeeAccessory {
         this.platform.Characteristic.TargetTemperature,
         state.current_heating_setpoint
       );
+    }
+    if (typeof state.position === 'number') {
+      if (state.position > 0)
+        this.thermostatService.updateCharacteristic(
+          this.platform.Characteristic.CurrentHeatingCoolingState,
+          HAP.Characteristic.CurrentHeatingCoolingState.HEAT
+        );
+      else
+        this.thermostatService.updateCharacteristic(
+          this.platform.Characteristic.CurrentHeatingCoolingState,
+          HAP.Characteristic.CurrentHeatingCoolingState.OFF
+        );
     }
   }
 }
